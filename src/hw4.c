@@ -22,12 +22,48 @@ int check_white(char c) {
     return (c >= 'A' && c <= 'Z');
 }
 
+int check_bounds(int dest_row, int dest_col) {
+    return ((dest_row >= 0 && dest_row < 8) && (dest_col >= 0 && dest_col < 8));
+}
+int check_eating(int dest_row, int dest_col, ChessGame *game){
+    if( (game->currentPlayer == WHITE_PLAYER) && (check_white(game->chessboard[dest_row][dest_col]) == 1) ){ // white eat white 
+        return 0;
+    }
+    else if((game->currentPlayer == BLACK_PLAYER) && (check_white(game->chessboard[dest_row][dest_col]) == 0)){//black eat black
+        return 0;
+    }
+    if((game->chessboard[dest_row][dest_col] == 'K') || (game->chessboard[dest_row][dest_col] == 'k')){
+        return 0;
+    }
+    return 1;
+}
+
+int check_basic(char piece, int dest_row, int dest_col, ChessGame *game){
+     //check if player is using the right piece 
+    if(check_white(piece) == 1 && game->currentPlayer != WHITE_PLAYER){
+        return 0; 
+    }
+    else if(check_white(piece) == 0 && game->currentPlayer != BLACK_PLAYER){
+        return 0; 
+    }
+    else if(piece == '.'){// check if the selected piece is empty; 
+        return 0; 
+    }
+    else if(check_bounds(dest_row,dest_col) == 0){
+        return 0; //out of bounds 
+    }
+    else{
+        return 1; 
+    }
+    
+}
+
 void chessboard_to_fen(char fen[], ChessGame *game) {
     (void)fen;
     (void)game;
 }
 
-bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int dest_col, ChessGame *game) {
+bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int dest_col, ChessGame *game){
     int move_direction_vertical;
     int move_direction_horizontal;
     int eating = 0;
@@ -36,6 +72,10 @@ bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int 
     int net_movement_vertical = abs(move_direction_vertical);
     int net_movement_horizontal = abs(move_direction_horizontal);
     
+    if(check_basic(piece, dest_row,dest_col,game) == 0){
+        return false; 
+    }
+
     if((net_movement_horizontal == 0) && (net_movement_vertical) ==0){//not moving at all 
         return false; 
     }
@@ -88,12 +128,13 @@ bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int 
         return false;
     }
     if(eating){
-        if( (game->currentPlayer == WHITE_PLAYER) && (check_white(game->chessboard[dest_row][dest_col]) == 1) ){ // white eat white 
-            return false;
+        if(check_eating(dest_row,dest_col,game) == 0){ // some eating rules is violated 
+            return false; 
         }
-        else if((game->currentPlayer == BLACK_PLAYER) && (check_white(game->chessboard[dest_row][dest_col]) == 0)){//black eat black
-            return false;
-        }else{
+        else if((game->chessboard[dest_row][dest_col]) == '.'){//eating empty 
+            return false; 
+        }
+        else{
             return true;
         }
     }
@@ -106,12 +147,58 @@ bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int 
 }
 
 bool is_valid_rook_move(int src_row, int src_col, int dest_row, int dest_col, ChessGame *game) {
-    (void)src_row;
-    (void)src_col;
-    (void)dest_row;
-    (void)dest_col;
-    (void)game;
-    return false;
+    int move_direction_vertical;
+    int move_direction_horizontal;
+    move_direction_horizontal = dest_col - src_col; // - means left + means right 
+    move_direction_vertical = dest_row - src_row; // - means moving up. + means moving down 
+    int net_movement_vertical = abs(dest_row - src_row);
+    int net_movement_horizontal = abs(dest_col - src_col);
+    int row_move; 
+    int col_move; 
+    if(check_basic(game->chessboard[src_row][src_col], dest_row,dest_col,game) == 0){
+        return false; 
+    }
+    //check if moving diagonally 
+    if(net_movement_horizontal > 0){
+        if(net_movement_vertical != 0){ // moving diagonally 
+            return false; 
+        }
+    }
+    if(net_movement_vertical > 0){
+        if(net_movement_horizontal != 0){ // moving diagonally 
+            return false; 
+        }
+    }
+
+    if(move_direction_horizontal <0){//moving left 
+        col_move = -1;
+        row_move = 0; 
+    }else if(move_direction_horizontal >0){ //moving right 
+        col_move = 1;
+        row_move = 0;
+    }
+    if(move_direction_vertical <0){//moving up 
+        row_move = -1;
+        col_move = 0; 
+    }else if(move_direction_horizontal >0){ //moving down 
+        row_move = 1;
+        col_move = 0;
+    }
+
+    //starting checking for obstructing piece 
+    int row, col;
+    for (row = src_row + row_move, col = src_col + col_move; row != dest_row || col != dest_col; row += row_move, col += col_move) {
+        if (game->chessboard[row][col] != '.') {
+            return false; // Path is blocked by another piece
+        }
+    }
+
+    //check destination 
+    if(check_basic == 0){
+        return false; 
+    }else{
+        return true;
+    }
 }
 
 bool is_valid_knight_move(int src_row, int src_col, int dest_row, int dest_col) {
