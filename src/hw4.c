@@ -392,6 +392,16 @@ void chessboard_to_fen(char fen[], ChessGame *game) {
 }
 
 int parse_move(const char *move, ChessMove *parsed_move) {
+    //clear the buffer
+    for (int i = 0; i < 3; i++) {
+        parsed_move->startSquare[i] = '\0';
+    }
+    for (int x = 0; x < 4; x++) {
+        parsed_move->endSquare[x] = '\0';
+    }
+    
+    
+
     int promoting = 0;
     int length = strlen(move);
     if(length != 4 && length != 5){
@@ -420,13 +430,13 @@ int parse_move(const char *move, ChessMove *parsed_move) {
     
     if(promoting){
         char promoting_piece = move[4];
-        if(dest_row_int != 8 && dest_row_int != 1){
+        if(dest_row != '8' && dest_row != '1'){
             return PARSE_MOVE_INVALID_DESTINATION;
         }
         if (promoting_piece != 'q' && promoting_piece != 'r' && promoting_piece != 'b' && promoting_piece != 'n') {
             return PARSE_MOVE_INVALID_PROMOTION;
         }
-        if(((dest_row_int- src_row_int)!= 1) ||((dest_row_int- src_row_int)!= -1)){//when you move more than 1 to get to dest 
+        if(((dest_row_int- src_row_int)!= 1) && ((dest_row_int- src_row_int)!= -1)){//when you move more than 1 to get to dest 
             return PARSE_MOVE_INVALID_FORMAT; // i created this case myself 
         }
         parsed_move->startSquare[0]=src_col;
