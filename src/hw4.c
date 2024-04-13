@@ -392,9 +392,55 @@ void chessboard_to_fen(char fen[], ChessGame *game) {
 }
 
 int parse_move(const char *move, ChessMove *parsed_move) {
-    (void)move;
-    (void)parsed_move;
-    return -999;
+    int promoting = 0;
+    int length = strlen(move);
+    if(length != 4 && length != 5){
+        return PARSE_MOVE_INVALID_FORMAT;
+    }
+    char src_col = move[0];
+    char src_row = move[1];
+    char dest_col = move[2];
+    char dest_row = move[3];
+    if(length == 5){//there is promotion
+        promoting = 1;
+    }
+    if (src_row < '1' || src_row > '8' || dest_row < '1' || dest_row > '8') {
+        return PARSE_MOVE_INVALID_FORMAT ;
+    }
+    if (src_col < 'a' || src_col > 'h' || dest_col < 'a' || dest_col > 'h' || src_row < '1' || src_row > '8' || dest_row < '1' || dest_row > '8'){
+        return PARSE_MOVE_OUT_OF_BOUNDS;
+    }
+    //parse the letters into corresponding int
+    int src_col_int = src_col - 'a';
+    (void)src_col_int;
+    int src_row_int = '8' - src_row;
+    int dest_col_int = dest_col - 'a';
+    (void)dest_col_int;
+    int dest_row_int = '8' - dest_row;
+    
+    if(promoting){
+        char promoting_piece = move[4];
+        if(dest_row_int != 8 && dest_row_int != 1){
+            return PARSE_MOVE_INVALID_DESTINATION;
+        }
+        if (promoting_piece != 'q' && promoting_piece != 'r' && promoting_piece != 'b' && promoting_piece != 'n') {
+            return PARSE_MOVE_INVALID_PROMOTION;
+        }
+        if(((dest_row_int- src_row_int)!= 1) ||((dest_row_int- src_row_int)!= -1)){//when you move more than 1 to get to dest 
+            return PARSE_MOVE_INVALID_FORMAT; // i created this case myself 
+        }
+        parsed_move->startSquare[0]=src_col;
+        parsed_move->startSquare[1]=src_row;
+        parsed_move->endSquare[0]= dest_col;
+        parsed_move->endSquare[1]= dest_row;
+        parsed_move->endSquare[2]= promoting_piece;
+        return 0;
+    }
+    parsed_move->startSquare[0]=src_col;
+    parsed_move->startSquare[1]=src_row;
+    parsed_move->endSquare[0]= dest_col;
+    parsed_move->endSquare[1]= dest_row;
+    return 0;
 }
 
 int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_move) {
