@@ -135,13 +135,19 @@ bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int 
     }
     //now you move up or down only by one 
     if(game->currentPlayer == WHITE_PLAYER){
-        if(check_white(game->chessboard[dest_row][dest_col]) == 0){ //eating enemy 
+        if(game->chessboard[dest_row][dest_col] == '.'){
+            return true;
+        }
+        else if(check_white(game->chessboard[dest_row][dest_col]) == 0){ //eating enemy 
             return false;
         }else{
             return true; //this should be invalid but handle it in part 4 
         }
     }else if(game->currentPlayer == BLACK_PLAYER){
-        if(check_white(game->chessboard[dest_row][dest_col]) == 1){//eating enemy 
+        if(game->chessboard[dest_row][dest_col] == '.'){
+            return true;
+        }
+        else if(check_white(game->chessboard[dest_row][dest_col]) == 1){//eating enemy 
             return false; 
         }else{
             return true; // capturing ally. handle in part 4 
@@ -184,7 +190,7 @@ bool is_valid_rook_move(int src_row, int src_col, int dest_row, int dest_col, Ch
     if(move_direction_vertical <0){//moving up 
         row_move = -1;
         col_move = 0; 
-    }else if(move_direction_horizontal >0){ //moving down 
+    }else if(move_direction_vertical >0){ //moving down 
         row_move = 1;
         col_move = 0;
     }
