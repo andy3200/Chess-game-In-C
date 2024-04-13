@@ -309,6 +309,9 @@ void fen_to_chessboard(const char *fen, ChessGame *game) {
     (void)game;
 }
 void chessboard_to_fen(char fen[], ChessGame *game) {
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        fen[i] = 0; // Set each element to 0
+    }
     int fen_index = 0;
     char piece;
     for (int x = 0; x < 8; x++) {
@@ -345,10 +348,10 @@ void chessboard_to_fen(char fen[], ChessGame *game) {
     fen[fen_index] = ' ';
     fen_index++;
     if(game->currentPlayer == WHITE_PLAYER){
-        fen[fen_index] = 'b';
+        fen[fen_index] = 'w';
         fen_index++;
     }else{
-        fen[fen_index] = 'w';
+        fen[fen_index] = 'b';
         fen_index++;
     }
     fen[fen_index] = '\0'; 
