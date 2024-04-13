@@ -404,10 +404,10 @@ int parse_move(const char *move, ChessMove *parsed_move) {
     if(length == 5){//there is promotion
         promoting = 1;
     }
-    if (src_row < '1' || src_row > '8' || dest_row < '1' || dest_row > '8') {
+    if (src_col < 'a' || src_col > 'h' || dest_col < 'a' || dest_col > 'h') {
         return PARSE_MOVE_INVALID_FORMAT ;
     }
-    if (src_col < 'a' || src_col > 'h' || dest_col < 'a' || dest_col > 'h' || src_row < '1' || src_row > '8' || dest_row < '1' || dest_row > '8'){
+    if ( src_row < '1' || src_row > '8' || dest_row < '1' || dest_row > '8'){
         return PARSE_MOVE_OUT_OF_BOUNDS;
     }
     //parse the letters into corresponding int
