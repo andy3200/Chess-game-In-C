@@ -420,15 +420,9 @@ int parse_move(const char *move, ChessMove *parsed_move) {
     if ( src_row < '1' || src_row > '8' || dest_row < '1' || dest_row > '8'){
         return PARSE_MOVE_OUT_OF_BOUNDS;
     }
-    //parse the letters into corresponding int
-    int src_col_int = src_col - 'a';
-    (void)src_col_int;
-    int src_row_int = '8' - src_row;
-    int dest_col_int = dest_col - 'a';
-    (void)dest_col_int;
-    int dest_row_int = '8' - dest_row;
-    
+
     if(promoting){
+        //int move_direction_vertical = dest_row - src_row; // + means moving up. - means moving down 
         char promoting_piece = move[4];
         if(dest_row != '8' && dest_row != '1'){
             return PARSE_MOVE_INVALID_DESTINATION;
@@ -436,7 +430,7 @@ int parse_move(const char *move, ChessMove *parsed_move) {
         if (promoting_piece != 'q' && promoting_piece != 'r' && promoting_piece != 'b' && promoting_piece != 'n') {
             return PARSE_MOVE_INVALID_PROMOTION;
         }
-        if(((dest_row_int- src_row_int)!= 1) && ((dest_row_int- src_row_int)!= -1)){//when you move more than 1 to get to dest 
+        if(((dest_row- src_row)!= 1) && ((dest_row- src_row)!= -1)){//when you move more than 1 to get to dest 
             return PARSE_MOVE_INVALID_FORMAT; // i created this case myself 
         }
         parsed_move->startSquare[0]=src_col;
@@ -454,11 +448,93 @@ int parse_move(const char *move, ChessMove *parsed_move) {
 }
 
 int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_move) {
-    (void)game;
-    (void)move;
-    (void)is_client;
-    (void)validate_move;
-    return -999;
+    //parse the letters into corresponding int (the mapping)
+    int src_col =  move->startSquare[0]- 'a';
+    int src_row = '8' - move->startSquare[1];
+    int dest_col = move->endSquare[0] - 'a';
+    int dest_row = '8' - move->endSquare[1];
+    char src_piece = game->chessboard[src_row][src_col];
+    int length_endsquare = strlen(move->endSquare);
+    int captured_pieces_index = 0;
+    if (validate_move) {
+        if((is_client && game->currentPlayer == BLACK_PLAYER) || (is_client == 0 && game->currentPlayer == WHITE_PLAYER)){ 
+            return MOVE_OUT_OF_TURN;
+        }
+        if(src_piece == '.'){
+            return MOVE_NOTHING;
+        }
+        if((check_white(src_piece) == 1) && (is_client == 0)){ //black player trying to move white piece
+            return MOVE_WRONG_COLOR;
+        }   
+        if((check_white(src_piece) == 0) && (is_client == 1)){ // white player moving black piece 
+            return MOVE_WRONG_COLOR;
+        }
+        if(check_eating(dest_row,dest_col,game) == 0){
+            return MOVE_SUS;
+        }
+        if((length_endsquare == 3) && (src_piece!= 'p' && src_piece != 'P')){
+            return MOVE_NOT_A_PAWN;
+        }
+        if((src_piece == 'p' || src_piece == 'P') && (length_endsquare == 2)){
+            if(src_piece== 'p' && dest_col == 7){
+                return MOVE_MISSING_PROMOTION;
+            }
+            if(src_piece == 'P' && dest_col == 0){
+                return MOVE_MISSING_PROMOTION;
+            }
+        }
+        if(is_valid_move(src_piece,src_row,src_col,dest_row,dest_col,game) == false){
+            return MOVE_WRONG;
+        }
+    }
+    if(is_valid_move(src_piece,src_row,src_col,dest_row,dest_col,game) == true){
+        if(length_endsquare == 3){//promotion occur 
+            char promoted_into = move->endSquare[2];
+            game->chessboard[src_row][src_col] = '.';
+            if(check_white(src_piece)){//if it's white
+                if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
+                    game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
+                    captured_pieces_index++;
+                    game->capturedCount++;
+                    game->chessboard[dest_row][dest_col] = promoted_into - 32; //assign and turn it into upper case 
+                }else{
+                    game->chessboard[dest_row][dest_col] = promoted_into - 32; //assign and turn it into upper case 
+                }
+            }
+            if(check_white(src_piece)== 0){//if it's black
+                if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
+                    game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
+                    captured_pieces_index++;
+                    game->capturedCount++;
+                    game->chessboard[dest_row][dest_col] = promoted_into;
+                }else{
+                    game->chessboard[dest_row][dest_col] = promoted_into; 
+                }
+            }
+            game->moves[game->moveCount] = *move;
+            game->moveCount++;
+        }else{//move regularly
+            game->chessboard[src_row][src_col] = '.'; 
+            if(game->chessboard[dest_row][dest_col]!= '.'){//eating occur
+                game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
+                captured_pieces_index++;
+                game->capturedCount++;
+                game->chessboard[dest_row][dest_col] = src_piece; //assign 
+            }else{ //eating doesn't occur 
+                game->chessboard[dest_row][dest_col] = src_piece; //assign 
+            }
+            game->moves[game->moveCount] = *move;
+            game->moveCount++;
+        }
+        if(game->currentPlayer == WHITE_PLAYER){
+            game->currentPlayer = BLACK_PLAYER;
+        }else{
+            game->currentPlayer = WHITE_PLAYER;
+        }
+        return 0;
+    }
+    return 10086; // this should never occur 
+    
 }
 
 int send_command(ChessGame *game, const char *message, int socketfd, bool is_client) {
