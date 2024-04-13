@@ -305,10 +305,38 @@ bool is_valid_move(char piece, int src_row, int src_col, int dest_row, int dest_
 }
 
 void fen_to_chessboard(const char *fen, ChessGame *game) {
-    (void)fen;
-    (void)game;
+    int row = 0, col = 0;
+    char piece;
+    int empty; 
+    for (int x = 0; fen[x] != '\0'; x++) {//loop through  the fen array 
+        piece = fen[x];
+        if (piece >= '1' && piece <= '8'){//we encounter an integer 
+            empty = piece - '0'; // cast it to int
+            for (int i = 0; i < empty; i++) {
+                game->chessboard[row][col]= '.';
+                col++;
+            }
+        }
+        else if(piece == '/'){ //move to next row 
+            col = 0; //reset col 
+            row++; //increase row
+        }else if(piece == ' '){ // we stop reading
+            piece = fen[x+1];
+            if(piece == 'b'){
+                game->currentPlayer = BLACK_PLAYER;
+            }else{
+                game->currentPlayer = WHITE_PLAYER;
+            }
+            break; // done
+        }
+        else{//we encounter a piece 
+            game->chessboard[row][col] = piece;
+            col++;
+        }
+    }
 }
 void chessboard_to_fen(char fen[], ChessGame *game) {
+    //this might be unnecessary 
     for (int i = 0; i < BUFFER_SIZE; i++) {
         fen[i] = 0; // Set each element to 0
     }
