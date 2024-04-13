@@ -469,7 +469,7 @@ int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_mo
         if((check_white(src_piece) == 0) && (is_client == 1)){ // white player moving black piece 
             return MOVE_WRONG_COLOR;
         }
-        if(check_eating(dest_row,dest_col,game) == 0){
+        if(game->chessboard[dest_row][dest_col] != '.' && check_eating(dest_row,dest_col,game) == 0){
             return MOVE_SUS;
         }
         if((length_endsquare == 3) && (src_piece!= 'p' && src_piece != 'P')){
