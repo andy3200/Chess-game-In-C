@@ -31,6 +31,7 @@ int check_white(char c) {
 int check_bounds(int dest_row, int dest_col) {
     return ((dest_row >= 0 && dest_row < 8) && (dest_col >= 0 && dest_col < 8));
 }
+
 int check_eating(int dest_row, int dest_col, ChessGame *game){
     if( (game->currentPlayer == WHITE_PLAYER) && (check_white(game->chessboard[dest_row][dest_col]) == 1) ){ // white eat white 
         return 0;
@@ -44,6 +45,7 @@ int check_eating(int dest_row, int dest_col, ChessGame *game){
     return 1;
 }
 
+/* 
 int check_basic(char piece, int dest_row, int dest_col, ChessGame *game){
      //check if player is using the right piece 
     if(check_white(piece) == 1 && game->currentPlayer != WHITE_PLAYER){
@@ -57,9 +59,11 @@ int check_basic(char piece, int dest_row, int dest_col, ChessGame *game){
     }
     
 }
+*/
 
 
 bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int dest_col, ChessGame *game){
+    (void)piece;
     int move_direction_vertical;
     int move_direction_horizontal;
     int eating = 0;
@@ -158,9 +162,6 @@ bool is_valid_rook_move(int src_row, int src_col, int dest_row, int dest_col, Ch
     int net_movement_horizontal = abs(move_direction_horizontal);
     int row_move; 
     int col_move; 
-    if(check_basic(game->chessboard[src_row][src_col], dest_row,dest_col,game) == 0){
-        return false; 
-    }
     //check if moving diagonally 
     if(net_movement_horizontal > 0){
         if(net_movement_vertical != 0){ // moving diagonally 
@@ -250,8 +251,6 @@ bool is_valid_queen_move(int src_row, int src_col, int dest_row, int dest_col, C
     move_direction_vertical = dest_row - src_row; // - means moving up. + means moving down 
     int net_movement_vertical = abs(move_direction_vertical);
     int net_movement_horizontal = abs(move_direction_horizontal);
-    int row_move;
-    int col_move; 
 
     if (net_movement_horizontal == net_movement_vertical || src_row == dest_row || src_col == dest_col) { // check if it moves diagonally or vertical or horizontal; 
         if(net_movement_horizontal == net_movement_vertical){//move like bishop diagonally 

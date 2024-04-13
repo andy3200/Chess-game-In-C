@@ -69,6 +69,9 @@ int save_game(ChessGame *game, const char *username, const char *db_filename);
 int load_game(ChessGame *game, const char *username, const char *db_filename, int save_number);
 int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_move);
 
+int check_white(char c);
+int check_bounds(int dest_row, int dest_col);
+int check_eating(int dest_row, int dest_col, ChessGame *game);
 bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int dest_col, ChessGame *game);
 bool is_valid_rook_move(int src_row, int src_col, int dest_row, int dest_col, ChessGame *game);
 bool is_valid_knight_move(int src_row, int src_col, int dest_row, int dest_col);
