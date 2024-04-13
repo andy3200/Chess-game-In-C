@@ -320,14 +320,14 @@ void chessboard_to_fen(char fen[], ChessGame *game) {
             piece = game->chessboard[x][y];
             if(piece == '.' && y == 7){// reaching last col and it's empty 
                 empty_count++;
-                fen[fen_index]= (char)(empty_count);
+                fen[fen_index]= empty_count + '0';;
                 fen_index++;
             } 
             else if(piece == '.'){
                 empty_count++;
             }else{
                 if(empty_count>0){//there are empty before the current index 
-                    fen[fen_index] = (char)(empty_count);
+                    fen[fen_index] = empty_count + '0';;
                     empty_count = 0;
                     fen_index++;
                     fen[fen_index] = piece;
