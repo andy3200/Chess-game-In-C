@@ -459,10 +459,10 @@ int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_mo
             return MOVE_NOT_A_PAWN;
         }
         if((src_piece == 'p' || src_piece == 'P') && (length_endsquare == 2)){
-            if(src_piece== 'p' && dest_col == 7){
+            if(src_piece== 'p' && dest_row == 7){
                 return MOVE_MISSING_PROMOTION;
             }
-            if(src_piece == 'P' && dest_col == 0){
+            if(src_piece == 'P' && dest_row == 0){
                 return MOVE_MISSING_PROMOTION;
             }
         }
