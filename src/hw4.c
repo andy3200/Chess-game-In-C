@@ -470,60 +470,57 @@ int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_mo
             return MOVE_WRONG;
         }
     }
-    if(is_valid_move(src_piece,src_row,src_col,dest_row,dest_col,game) == true){
-        if(length_endsquare == 3){//promotion occur 
-            char promoted_into = move->endSquare[2];
-            game->chessboard[src_row][src_col] = '.';
-            if(check_white(src_piece)){//if it's white
-                if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
-                    if(check_eating(dest_row,dest_col,game)== 0){
-                        return MOVE_SUS;
-                    }
-                    game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
-                    captured_pieces_index++;
-                    game->capturedCount++;
-                    game->chessboard[dest_row][dest_col] = promoted_into - 32; //assign and turn it into upper case 
-                }else{
-                    game->chessboard[dest_row][dest_col] = promoted_into - 32; //assign and turn it into upper case 
+    if(length_endsquare == 3){//promotion occur 
+        char promoted_into = move->endSquare[2];
+        game->chessboard[src_row][src_col] = '.';
+        if(check_white(src_piece)){//if it's white
+            if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
+                if(check_eating(dest_row,dest_col,game)== 0){
+                    return MOVE_SUS;
                 }
-            }
-            if(check_white(src_piece)== 0){//if it's black
-                if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
-                    if(check_eating(dest_row,dest_col,game)== 0){
-                        return MOVE_SUS;
-                    }
-                    game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
-                    captured_pieces_index++;
-                    game->capturedCount++;
-                    game->chessboard[dest_row][dest_col] = promoted_into;
-                }else{
-                    game->chessboard[dest_row][dest_col] = promoted_into; 
-                }
-            }
-            game->moves[game->moveCount] = *move;
-            game->moveCount++;
-        }else{//move regularly
-            game->chessboard[src_row][src_col] = '.'; 
-            if(game->chessboard[dest_row][dest_col]!= '.'){//eating occur
                 game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
                 captured_pieces_index++;
                 game->capturedCount++;
-                game->chessboard[dest_row][dest_col] = src_piece; //assign 
-            }else{ //eating doesn't occur 
-                game->chessboard[dest_row][dest_col] = src_piece; //assign 
+                game->chessboard[dest_row][dest_col] = promoted_into - 32; //assign and turn it into upper case 
+            }else{
+                game->chessboard[dest_row][dest_col] = promoted_into - 32; //assign and turn it into upper case 
             }
-            game->moves[game->moveCount] = *move;
-            game->moveCount++;
         }
-        if(game->currentPlayer == WHITE_PLAYER){
-            game->currentPlayer = BLACK_PLAYER;
-        }else{
-            game->currentPlayer = WHITE_PLAYER;
+        if(check_white(src_piece)== 0){//if it's black
+            if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
+                if(check_eating(dest_row,dest_col,game)== 0){
+                    return MOVE_SUS;
+                }
+                game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
+                captured_pieces_index++;
+                game->capturedCount++;
+                game->chessboard[dest_row][dest_col] = promoted_into;
+            }else{
+                game->chessboard[dest_row][dest_col] = promoted_into; 
+            }
         }
-        return 0;
-    }else{
-        return MOVE_WRONG;
+        game->moves[game->moveCount] = *move;
+        game->moveCount++;
+    }else{//move regularly
+        game->chessboard[src_row][src_col] = '.'; 
+        if(game->chessboard[dest_row][dest_col]!= '.'){//eating occur
+            game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
+            captured_pieces_index++;
+            game->capturedCount++;
+            game->chessboard[dest_row][dest_col] = src_piece; //assign 
+        }else{ //eating doesn't occur 
+            game->chessboard[dest_row][dest_col] = src_piece; //assign 
+        }
+        game->moves[game->moveCount] = *move;
+        game->moveCount++;
     }
+    if(game->currentPlayer == WHITE_PLAYER){
+        game->currentPlayer = BLACK_PLAYER;
+    }else{
+        game->currentPlayer = WHITE_PLAYER;
+    }
+    return 0;
+    
   
     
 }
