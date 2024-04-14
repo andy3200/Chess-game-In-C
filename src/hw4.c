@@ -476,6 +476,9 @@ int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_mo
             game->chessboard[src_row][src_col] = '.';
             if(check_white(src_piece)){//if it's white
                 if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
+                    if(check_eating(dest_row,dest_col,game)== 0){
+                        return MOVE_SUS;
+                    }
                     game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
                     captured_pieces_index++;
                     game->capturedCount++;
@@ -486,6 +489,9 @@ int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_mo
             }
             if(check_white(src_piece)== 0){//if it's black
                 if(game->chessboard[dest_row][dest_col]!= '.'){//eating and promoting occurs
+                    if(check_eating(dest_row,dest_col,game)== 0){
+                        return MOVE_SUS;
+                    }
                     game->capturedPieces[captured_pieces_index] = game->chessboard[dest_row][dest_col];
                     captured_pieces_index++;
                     game->capturedCount++;
