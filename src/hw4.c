@@ -89,12 +89,12 @@ bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int 
             if(game->currentPlayer == BLACK_PLAYER){
                 if(game->chessboard[dest_row-1][dest_col] != '.'){
                     return false;
+                }else if(game->chessboard[dest_row][dest_col] != '.'){ //destination is not empty 
+                    return false; 
                 }else{
                     return true; 
                 }
             }
-
-
         }else if(net_movement_horizontal != 0){ //move 2 vertically but also moving to left or right 
             return false; 
         }
@@ -124,7 +124,7 @@ bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int 
         else if(check_white(game->chessboard[dest_row][dest_col]) == 0){ //eating enemy 
             return false;
         }else{
-            return true; //this should be invalid but handle it in part 4 
+            return false; 
         }
     }else if(game->currentPlayer == BLACK_PLAYER){
         if(game->chessboard[dest_row][dest_col] == '.'){
@@ -133,7 +133,7 @@ bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int 
         else if(check_white(game->chessboard[dest_row][dest_col]) == 1){//eating enemy 
             return false; 
         }else{
-            return true; // capturing ally. handle in part 4 
+            return false; // capturing ally. handle in part 4 
         }
     }else if(game->chessboard[dest_row][dest_col] == '.'){
         return true;
