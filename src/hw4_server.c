@@ -5,7 +5,7 @@ int main() {
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-
+    char buffer[BUFFER_SIZE] = {0};
     // Create socket
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
@@ -43,13 +43,39 @@ int main() {
         perror("accept");
         exit(EXIT_FAILURE);
     }
-
+    ChessGame game;
+    initialize_game(&game);
     INFO("Server accepted connection");
 
     while (1) {
-        // Fill this in
+        memset(buffer, 0, BUFFER_SIZE);
+        int nbytes = read(connfd, buffer, BUFFER_SIZE);
+        if (nbytes <= 0) {
+            perror("[Server] read() failed.");
+            exit(EXIT_FAILURE);
+        }
+        if(receive_command(&game,buffer,connfd,false) == COMMAND_FORFEIT){
+            printf("[Server] Client quitting...\n");
+            close(listenfd);
+            break;
+        }
+        printf("[Server] Enter message: ");
+        memset(buffer, 0, BUFFER_SIZE);
+        fgets(buffer, BUFFER_SIZE, stdin);
+        buffer[strlen(buffer)-1] = '\0';
+        int send_return = send_command(&game,buffer,connfd,false);
+        while( send_return == COMMAND_ERROR || send_command == COMMAND_UNKNOWN ){
+            printf("[Server] Enter message: ");
+            memset(buffer, 0, BUFFER_SIZE);
+            fgets(buffer, BUFFER_SIZE, stdin);
+            buffer[strlen(buffer)-1] = '\0';
+            int send_return = send_command(&game,buffer,connfd,false);
+        }
+        if(send_return == COMMAND_FORFEIT){
+            printf("[Server] server quitting...\n");
+            close(listenfd);
+            break;
+        }
     }
-
-    close(listenfd);
     return 0;
 }
