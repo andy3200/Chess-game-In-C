@@ -545,18 +545,46 @@ int receive_command(ChessGame *game, const char *message, int socketfd, bool is_
 }
 
 int save_game(ChessGame *game, const char *username, const char *db_filename) {
-    (void)game;
-    (void)username;
-    (void)db_filename;
-    return -999;
+    char fen[BUFFER_SIZE];
+    if(username == NULL || username[0] == '\0' || strchr(username, ' ') != NULL){//invalid username 
+        return -1;
+    }
+    FILE *file = fopen(db_filename, "a");
+    if (file == NULL) {
+        return -1;
+    }
+    chessboard_to_fen(fen, game);
+    fprintf(file, "%s:%s\n", username, fen);
+    fclose(file);
+    return 0;
 }
 
 int load_game(ChessGame *game, const char *username, const char *db_filename, int save_number) {
-    (void)game;
-    (void)username;
-    (void)db_filename;
-    (void)save_number;
-    return -999;
+    char each_line[BUFFER_SIZE+51];
+    int game_count =0; 
+    if(save_number ==0){
+        return -1;
+    }
+    FILE *file = fopen(db_filename, "r");
+    if (file == NULL) {
+        return -1;
+    }
+    if(username == NULL || username[0] == '\0' || strchr(username, ' ') != NULL){//invalid username 
+        return -1;
+    }
+    while (fgets(each_line, BUFFER_SIZE+51, file)){
+        char* extracted_username = strtok(each_line, ":");
+        char* fen = strtok(NULL, ":");
+        if (strcmp(extracted_username, username) == 0) {//we found the username 
+            game_count++;
+            if(game_count == save_number){//we found the game corresponding to the user 
+                fen_to_chessboard(fen,game);
+                fclose(file);
+                return 0;
+            }
+        }
+    }
+    return -1;
 }
 
 void display_chessboard(ChessGame *game) {
