@@ -518,9 +518,8 @@ int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_mo
             game->currentPlayer = WHITE_PLAYER;
         }
         return 0;
-    }
-    if(is_valid_move(src_piece,src_row,src_col,dest_row,dest_col,game) == false){
-            return MOVE_WRONG;
+    }else{
+        return MOVE_WRONG;
     }
   
     
