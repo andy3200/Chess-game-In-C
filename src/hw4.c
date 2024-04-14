@@ -45,21 +45,7 @@ int check_eating(int dest_row, int dest_col, ChessGame *game){
     return 1;
 }
 
-/* 
-int check_basic(char piece, int dest_row, int dest_col, ChessGame *game){
-     //check if player is using the right piece 
-    if(check_white(piece) == 1 && game->currentPlayer != WHITE_PLAYER){
-        return 0; 
-    }
-    else if(check_white(piece) == 0 && game->currentPlayer != BLACK_PLAYER){
-        return 0; 
-    }
-    else{
-        return 1; 
-    }
-    
-}
-*/
+
 
 
 bool is_valid_pawn_move(char piece, int src_row, int src_col, int dest_row, int dest_col, ChessGame *game){
@@ -533,7 +519,10 @@ int make_move(ChessGame *game, ChessMove *move, bool is_client, bool validate_mo
         }
         return 0;
     }
-    return 10086; // this should never occur 
+    if(is_valid_move(src_piece,src_row,src_col,dest_row,dest_col,game) == false){
+            return MOVE_WRONG;
+    }
+  
     
 }
 
