@@ -42,12 +42,12 @@ int main() {
         fgets(buffer, BUFFER_SIZE, stdin);
         buffer[strlen(buffer)-1] = '\0';
         int send_return = send_command(&game,buffer,connfd,true);
-        while( send_return == COMMAND_ERROR || send_command == COMMAND_UNKNOWN ){
+        while( send_return == COMMAND_ERROR || send_return == COMMAND_UNKNOWN ){
             printf("[client] Enter message: ");
             memset(buffer, 0, BUFFER_SIZE);
             fgets(buffer, BUFFER_SIZE, stdin);
             buffer[strlen(buffer)-1] = '\0';
-            int send_return = send_command(&game,buffer,connfd,true);
+            send_return = send_command(&game,buffer,connfd,true);
         }if(send_return == COMMAND_FORFEIT){
             printf("[client] server quitting...\n");
             break;
