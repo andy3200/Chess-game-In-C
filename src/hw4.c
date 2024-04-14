@@ -564,6 +564,7 @@ int send_command(ChessGame *game, const char *message, int socketfd, bool is_cli
         display_chessboard(game);
         return COMMAND_DISPLAY;
     }else if (strcmp(command, "import") == 0) {
+        number_read= sscanf(message, "/%s %[^\n]", command, arg1);
         if(number_read != 2){ // different args number read
             return COMMAND_ERROR;
         }
@@ -632,6 +633,7 @@ int receive_command(ChessGame *game, const char *message, int socketfd, bool is_
         close(socketfd);
         return COMMAND_FORFEIT;
     }else if (strcmp(command, "import") == 0) {
+        number_read= sscanf(message, "/%s %[^\n]", command, arg1);
         if(number_read != 2){ // different args number read
             return COMMAND_ERROR;
         }
