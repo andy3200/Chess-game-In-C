@@ -39,9 +39,6 @@ int check_eating(int dest_row, int dest_col, ChessGame *game){
     else if((game->currentPlayer == BLACK_PLAYER) && (check_white(game->chessboard[dest_row][dest_col]) == 0)){//black eat black
         return 0;
     }
-    if((game->chessboard[dest_row][dest_col] == 'K') || (game->chessboard[dest_row][dest_col] == 'k')){
-        return 0;
-    }
     return 1;
 }
 
